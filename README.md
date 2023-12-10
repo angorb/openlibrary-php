@@ -1,7 +1,7 @@
 # **Open Library API Client**
 
-> [!NOTE]
-> This was forked from [beezus/openlibrary-php](https://github.com/beezus/openlibrary-php) in order to add updated support for current [guzzlehttp/guzzle](https://github.com/guzzle/guzzle/):^7.0 and PHP >=8.
+> [!WARNING]
+> This was forked from [beezus/openlibrary-php](https://github.com/beezus/openlibrary-php) in order to add updated support for current [guzzlehttp/guzzle](https://github.com/guzzle/guzzle/):^7.0 and PHP >=8. It's looking like the API has changed pretty significantly, so this is going to need more work than originally thought to return sane responses. The OLID endpoint appears to work now, but that's about it so far.
 
 Allows some interaction with the [Open Library API](http://openlibrary.org/developers/api) using an object-based interface.
 
