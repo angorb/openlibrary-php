@@ -2,6 +2,8 @@
 
 namespace OpenLibrary\API;
 
+use GuzzleHttp\Psr7\Response;
+
 /**
  * A client to access the Open Library API
  */
@@ -41,17 +43,17 @@ class Client
     }
 
     /**
-     * Get a book by its Open Library ID
+     * Get a book by its ISBN
      *
-     * @param string $olid the OLID
+     * @param string $isbn the ISBN
      * @return object the response
      */
     public function getBookByISBN($isbn)
     {
         $searchResults = $this->searchByISBN($isbn);
         $searchPath = 'ISBN:' . $isbn;
-        if (\property_exists($searchResults, $searchPath)) {
-            throw new RequestException('No match for ISBN ' . $isbn);
+        if (!\property_exists($searchResults, $searchPath)) {
+            throw new RequestException(new Response(404, [], 'No match for ISBN ' . $isbn));
         }
         $pathParts = \explode('/', \parse_url($searchResults->$searchPath->info_url, \PHP_URL_PATH));
         return $this->getBookByOLID($pathParts[2]);
