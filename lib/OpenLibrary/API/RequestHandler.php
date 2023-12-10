@@ -3,6 +3,7 @@
 namespace OpenLibrary\API;
 
 use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Psr7\Response;
 
 /**
  * A request handler for Open Library API requests
@@ -20,13 +21,13 @@ class RequestHandler
     {
         $this->base_url = 'https://openlibrary.org';
 
-        $this->version = '0.0.7';
+        $this->version = '2.0.0';
 
         $this->client = new GuzzleClient([
             'base_uri' => $this->base_url,
             'allow_redirects' => false,
             'headers' => [
-                'User-Agent' => 'openlibrary.php/' . $this->version
+                'User-Agent' => 'openlibrary-php/' . $this->version
             ]
         ]);
     }
@@ -54,13 +55,14 @@ class RequestHandler
     public function request($method, $path, $options)
     {
         // Ensure there are options
-        $options = $options ?: array();
+        $options = $options ?: [];
 
         // Collapse Guzzle's errors to deal with at the Client level
         try {
             $response = $this->client->get($path, $options);
-        } catch (\GuzzleHttp\Exception\BadResponseException $e) {
-            // TODO fail
+        } catch (\Throwable $t) {
+            // TODO rough fail, this needs work
+            $response = new Response('500', [], 'No Response');
         }
 
         // Construct the object that the Client expects to see, and return it

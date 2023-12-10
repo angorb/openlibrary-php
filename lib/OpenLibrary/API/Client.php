@@ -41,37 +41,65 @@ class Client
     }
 
     /**
-     * Find editions by International Standard Book Number
+     * Get a book by its Open Library ID
      *
-     * @param string $isbn the ISBN
-     * @return object the response array
+     * @param string $olid the OLID
+     * @return object the response
      */
-    public function queryEditionsByISBN($isbn)
+    public function getBookByISBN($isbn)
+    {
+        $searchResults = $this->searchByISBN($isbn);
+        $searchPath = 'ISBN:' . $isbn;
+        if (\property_exists($searchResults, $searchPath)) {
+            throw new RequestException('No match for ISBN ' . $isbn);
+        }
+        $pathParts = \explode('/', \parse_url($searchResults->$searchPath->info_url, \PHP_URL_PATH));
+        return $this->getBookByOLID($pathParts[2]);
+    }
+
+    public function searchByISBN($isbn)
     {
         switch (strlen($isbn)) {
             case 10:
-                $isbn_type = 'isbn_10';
                 break;
             case 13:
-                $isbn_type = 'isbn_13';
                 break;
-
             default:
                 throw new \InvalidArgumentException('ISBN must be 10 or 13 characters.');
         }
 
         return $this->getRequest(
-            '/query.json',
+            '/api/books',
             [
-                'type' => '/type/edition',
-                $isbn_type => $isbn,
-                '*' => ''
+                'query' =>
+                [
+                    'format' => 'json',
+                    'bibkeys' => 'ISBN:' . $isbn
+                ]
+            ]
+        );
+    }
+
+    public function searchByLCCN($isbn)
+    {
+        if (strlen($isbn) !== 12) {
+            throw new \InvalidArgumentException('LCCN must be 10 or 13 characters.');
+        }
+
+        return $this->getRequest(
+            '/api/books',
+            [
+                'query' =>
+                [
+                    'format' => 'json',
+                    'bibkeys' => 'LCCN:' . $isbn
+                ]
             ]
         );
     }
 
     /**
-     * Find editions by Library of Congress Control Number
+     * FIXME: Find editions by Library of Congress Control Number
      *
      * @param string $lccn the LCNN
      * @return object the response array
@@ -89,7 +117,7 @@ class Client
     }
 
     /**
-     * Find editions by Online Computer Library Center number
+     * FIXME: Find editions by Online Computer Library Center number
      *
      * @param string $oclc the OCLC number
      * @return object the response array
